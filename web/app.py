@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 from dataclasses import asdict
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -8,14 +9,16 @@ from jobs.ratelimit import check_and_reserve
 from jobs.queue import enqueue_job
 from web.forms import build_spec
 
-app = FastAPI(title="WycenaFinder")
+
+@asynccontextmanager
+async def lifespan(app):
+    init_db()
+    yield
+
+
+app = FastAPI(title="WycenaFinder", lifespan=lifespan)
 templates = Jinja2Templates(directory="web/templates")
 templates.env.filters["fmt"] = lambda n: f"{int(n):,}".replace(",", " ") if n is not None else "—"
-
-
-@app.on_event("startup")
-def _startup():
-    init_db()
 
 
 @app.get("/", response_class=HTMLResponse)
