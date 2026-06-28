@@ -21,6 +21,12 @@ templates = Jinja2Templates(directory="web/templates")
 templates.env.filters["fmt"] = lambda n: f"{int(n):,}".replace(",", " ") if n is not None else "—"
 
 
+def _href_safe(u):
+    u = str(u or "")
+    return u if u.startswith(("http://", "https://")) else "#"
+templates.env.filters["href_safe"] = _href_safe
+
+
 @app.get("/", response_class=HTMLResponse)
 def index(request: Request):
     return templates.TemplateResponse(request, "index.html")
@@ -76,8 +82,9 @@ def job_status(request: Request, job_id: str):
         if job.status == "error":
             return templates.TemplateResponse(
                 request, "_error.html", {"error": job.error_msg})
-        results = [r.data for r in sorted(job.results, key=lambda r: r.rank)]
-        return templates.TemplateResponse(
-            request, "_results.html", {"results": results, "job": job})
+        if job.status == "done":
+            results = [r.data for r in sorted(job.results, key=lambda r: r.rank)]
+            return templates.TemplateResponse(request, "_results.html", {"results": results, "job": job})
+        return templates.TemplateResponse(request, "_error.html", {"error": f"nieznany status: {job.status}"})
     finally:
         session.close()
