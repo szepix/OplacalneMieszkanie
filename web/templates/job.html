@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block body %}
+<p><a href="/">&larr; Nowe wyszukiwanie</a></p>
+<h1>Zlecenie {{ job_id }}</h1>
+<div id="status" hx-get="/job/{{ job_id }}/status" hx-trigger="load" hx-swap="outerHTML">
+  <p>Ładowanie statusu…</p>
+</div>
+{% endblock %}

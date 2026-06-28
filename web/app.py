@@ -49,3 +49,35 @@ async def search(request: Request):
         session.close()
     enqueue_job(job_id)
     return RedirectResponse(f"/job/{job_id}", status_code=303)
+
+
+@app.get("/job/{job_id}", response_class=HTMLResponse)
+def job_page(request: Request, job_id: str):
+    session = SessionLocal()
+    try:
+        job = crud.get_job(session, job_id)
+    finally:
+        session.close()
+    if not job:
+        return HTMLResponse("Nie znaleziono zlecenia.", status_code=404)
+    return templates.TemplateResponse(request, "job.html", {"job_id": job_id})
+
+
+@app.get("/job/{job_id}/status", response_class=HTMLResponse)
+def job_status(request: Request, job_id: str):
+    session = SessionLocal()
+    try:
+        job = crud.get_job(session, job_id)
+        if not job:
+            return HTMLResponse("Nie znaleziono.", status_code=404)
+        if job.status in ("queued", "processing"):
+            return templates.TemplateResponse(
+                request, "_status.html", {"job_id": job_id, "status": job.status})
+        if job.status == "error":
+            return templates.TemplateResponse(
+                request, "_error.html", {"error": job.error_msg})
+        results = [r.data for r in sorted(job.results, key=lambda r: r.rank)]
+        return templates.TemplateResponse(
+            request, "_results.html", {"results": results, "job": job})
+    finally:
+        session.close()
