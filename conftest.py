@@ -49,3 +49,7 @@ def redis_conn():
         yield c
     finally:
         c.flushdb()
+
+
+def pytest_configure(config):
+    config.addinivalue_line("markers", "e2e: real-network end-to-end journey (slow)")
