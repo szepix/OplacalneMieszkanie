@@ -13,7 +13,7 @@
         <td>{{ loop.index }}</td>
         <td><strong>{{ r.value }}</strong></td>
         <td>{{ r.eff_price|fmt }}</td>
-        <td>{{ [r.wycena, r.wycena_med]|select|min|fmt }}</td>
+        <td>{{ ([r.wycena, r.wycena_med]|select|list|min|fmt) if (r.wycena or r.wycena_med) else "—" }}</td>
         <td>{{ r.area|round(0) }}</td>
         <td><a href="{{ r.url|href_safe }}" target="_blank" rel="noopener">
           {{ r.street or r.district or "—" }}{% if r.number %} {{ r.number }}{% endif %}

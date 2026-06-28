@@ -36,6 +36,19 @@ def test_status_fragment_renders_results_when_done(client, db):
     assert "every 2s" not in r.text  # polling stops when done
 
 
+def test_results_render_when_wycena_missing(client, db):
+    from db import crud
+    job = crud.create_job(db, "1.1.1.1", {"woj": "x", "miasto": "y", "rooms": []})
+    crud.add_results(db, job.id, [{"url": "https://olx/x", "value": 1.10,
+                                   "eff_price": 400000, "area": 40.0,
+                                   "src": "OLX", "reliable": False, "suspect": False}])
+    crud.set_status(db, job.id, "done", count_qualified=1,
+                    finished_at=datetime.now(timezone.utc))
+    r = client.get(f"/job/{job.id}/status")
+    assert r.status_code == 200
+    assert "—" in r.text
+
+
 def test_status_fragment_shows_error(client, db):
     from db import crud
     job = crud.create_job(db, "1.1.1.1", {"woj": "x", "miasto": "y", "rooms": []})

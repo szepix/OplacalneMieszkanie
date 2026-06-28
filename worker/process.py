@@ -1,6 +1,9 @@
+import logging
 from datetime import datetime, timezone
 from db.session import SessionLocal
 from db import crud
+
+logger = logging.getLogger(__name__)
 from db.cache import install_db_valuation_cache, uninstall_db_valuation_cache
 from pipeline.spec import SearchSpec
 from pipeline.search import run_search
@@ -22,6 +25,7 @@ def process_job(job_id: str) -> None:
     try:
         job = crud.get_job(session, job_id)
         if not job:
+            logger.warning("process_job: job %s not found, skipping", job_id)
             return
         crud.set_status(session, job_id, "processing", started_at=_now())
 
