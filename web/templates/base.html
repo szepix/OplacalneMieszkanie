@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WycenaFinder</title>
+  <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+  <style>
+    body { font: 15px/1.5 system-ui, sans-serif; max-width: 1000px; margin: 2rem auto; padding: 0 1rem; }
+    label { display: inline-block; margin: .25rem .75rem .25rem 0; }
+    input[type=text], input[type=number], select { padding: .3rem; }
+    table { border-collapse: collapse; width: 100%; margin-top: 1rem; }
+    td, th { border: 1px solid #ddd; padding: 4px 8px; text-align: left; }
+    .err { color: #b00020; font-weight: 600; }
+    .suspect { color: #b07000; }
+    .reliable { color: #008000; }
+    fieldset { border: 1px solid #ccc; margin: .5rem 0; }
+  </style>
+</head>
+<body>{% block body %}{% endblock %}</body>
+</html>

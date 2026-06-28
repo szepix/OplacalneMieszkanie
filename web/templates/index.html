@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>WycenaFinder</h1>
+<p>Znajdź mieszkania najlepiej wycenione względem rynku (cała Polska).</p>
+{% if error %}<p class="err">{{ error }}</p>{% endif %}
+<form method="post" action="/search">
+  <fieldset>
+    <legend>Lokalizacja</legend>
+    <label>Województwo <input type="text" name="woj" required placeholder="malopolskie"></label>
+    <label>Miasto <input type="text" name="miasto" required placeholder="krakow"></label>
+  </fieldset>
+  <fieldset>
+    <legend>Pokoje</legend>
+    {% for n in [1, 2, 3, 4, 5] %}
+      <label><input type="checkbox" name="rooms" value="{{ n }}"> {{ n }}{% if n == 5 %}+{% endif %}</label>
+    {% endfor %}
+  </fieldset>
+  <fieldset>
+    <legend>Cena / metraż / rok / piętro</legend>
+    <label>Cena od <input type="number" name="price_min" min="0"></label>
+    <label>do <input type="number" name="price_max" min="0"></label>
+    <label>m² od <input type="number" name="area_min" min="0"></label>
+    <label>do <input type="number" name="area_max" min="0"></label>
+    <label>Rok od <input type="number" name="year_min"></label>
+    <label>Piętro <input type="number" name="floor"></label>
+  </fieldset>
+  <fieldset>
+    <legend>Cechy (wymagane)</legend>
+    {% for f in ["ogrod", "parking", "klimatyzacja", "komorka"] %}
+      <label><input type="checkbox" name="features" value="{{ f }}"> {{ f }}</label>
+    {% endfor %}
+  </fieldset>
+  <fieldset>
+    <legend>Opis i rynek</legend>
+    <label>Słowa kluczowe (po przecinku) <input type="text" name="keywords" placeholder="winda, balkon"></label>
+    <label>Rynek
+      <select name="rynek">
+        <option value="any">dowolny</option>
+        <option value="pierwotny">pierwotny</option>
+        <option value="wtorny">wtórny</option>
+      </select>
+    </label>
+  </fieldset>
+  <button type="submit">Szukaj najlepszych wycen</button>
+</form>
+{% endblock %}

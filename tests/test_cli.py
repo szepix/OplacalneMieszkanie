@@ -1,4 +1,6 @@
-import subprocess, sys, json
+import subprocess, sys, json, os
+
+REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 def test_cli_city_not_found_exits_clean(tmp_path):
     out = tmp_path / "r.json"
@@ -6,7 +8,7 @@ def test_cli_city_not_found_exits_clean(tmp_path):
         [sys.executable, "-m", "pipeline.cli", "--woj", "mazowieckie",
          "--miasto", "Nieistniejewo123", "--rooms", "3", "--max-pages", "1",
          "--json", str(out)],
-        cwd="/Users/szepix/olx", capture_output=True, text=True, timeout=120)
+        cwd=REPO_ROOT, capture_output=True, text=True, timeout=120)
     assert p.returncode == 0
     with open(out) as f:
         data = json.load(f)

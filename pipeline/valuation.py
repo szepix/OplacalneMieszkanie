@@ -17,22 +17,39 @@ _WYC_RX = {
 }
 
 WYC = {}
+_MISS = object()
+
+
+def _default_get(key):
+    return WYC.get(key, _MISS)
+
+
+def _default_set(key, val):
+    WYC[key] = val
+
+
+cache_get = _default_get
+cache_set = _default_set
+
 
 def wycena(lat, lng, area):
     key = f"{round(lat,5)},{round(lng,5)},{int(area)}"
-    if key in WYC: return WYC[key]
+    hit = cache_get(key)
+    if hit is not _MISS:
+        return hit
     q = {"lat": f"{lat}", "lng": f"{lng}", "area": str(int(area))}
     t = _get(DEWELOPER + "?" + urllib.parse.urlencode(q),
              {"Accept": "*/*", "Referer": "https://deweloperuch.pl/wycena"})
     out = {}
     for k, rx in _WYC_RX.items():
         m = rx.search(t)
-        if not m: continue
+        if not m:
+            continue
         out[k] = (m.group(1) if k == "radius" else
                   m.group(1) == "true" if k == "reliable" else
                   float(m.group(1)) if k == "r2" else int(m.group(1)))
     res = out if out.get("value") else None
-    WYC[key] = res
+    cache_set(key, res)
     return res
 
 def value_of(r, spec, use_address_geocode=False, warszawa=False):

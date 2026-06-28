@@ -1,0 +1,32 @@
+<div id="status">
+  <p>Gotowe — {{ results|length }} ofert z wyceną
+     {% if job.from_cache %}(z cache){% endif %}.</p>
+  {% if results %}
+  <table>
+    <thead><tr>
+      <th>#</th><th>value</th><th>cena (zł)</th><th>wycena (zł)</th>
+      <th>m²</th><th>lokalizacja</th><th>źródło</th><th>flagi</th>
+    </tr></thead>
+    <tbody>
+    {% for r in results %}
+      <tr>
+        <td>{{ loop.index }}</td>
+        <td><strong>{{ r.value }}</strong></td>
+        <td>{{ r.eff_price|fmt }}</td>
+        <td>{{ ([r.wycena, r.wycena_med]|select|list|min|fmt) if (r.wycena or r.wycena_med) else "—" }}</td>
+        <td>{{ r.area|round(0) }}</td>
+        <td><a href="{{ r.url|href_safe }}" target="_blank" rel="noopener">
+          {{ r.street or r.district or "—" }}{% if r.number %} {{ r.number }}{% endif %}
+          {% if r.metro_name %}· M: {{ r.metro_name }} ({{ r.metro_m }} m){% endif %}
+        </a></td>
+        <td>{{ r.src }}</td>
+        <td>
+          {% if r.reliable %}<span class="reliable">pewne</span>{% endif %}
+          {% if r.suspect %}<span class="suspect">podejrzane</span>{% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}<p>Brak ofert spełniających kryteria.</p>{% endif %}
+</div>
