@@ -1,51 +1,34 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="320" viewBox="0 0 1280 320" role="img" aria-label="OplacalneMieszkanie">
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="320" viewBox="0 0 1280 320" role="img" aria-label="Opłacalne Mieszkanie">
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#0f766e"/>
-      <stop offset="0.55" stop-color="#0d9488"/>
-      <stop offset="1" stop-color="#14532d"/>
-    </linearGradient>
-    <linearGradient id="tag" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#fde68a"/>
-      <stop offset="1" stop-color="#f59e0b"/>
-    </linearGradient>
-    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="#000" flood-opacity="0.25"/>
+    <filter id="tileShadow" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="8" stdDeviation="14" flood-color="#000000" flood-opacity="0.35"/>
     </filter>
   </defs>
 
-  <rect width="1280" height="320" fill="url(#bg)"/>
+  <!-- flat ink ground -->
+  <rect width="1280" height="320" fill="#0e1116"/>
 
-  <!-- skyline -->
-  <g opacity="0.16" fill="#ffffff">
-    <rect x="60"  y="180" width="70"  height="140"/>
-    <rect x="150" y="140" width="60"  height="180"/>
-    <rect x="230" y="200" width="80"  height="120"/>
-    <rect x="980" y="160" width="70"  height="160"/>
-    <rect x="1070" y="120" width="60" height="200"/>
-    <rect x="1150" y="190" width="80" height="130"/>
-  </g>
+  <!-- subtle editorial keyline -->
+  <rect x="20" y="20" width="1240" height="280" rx="18" fill="none" stroke="#ffffff" stroke-opacity="0.07" stroke-width="1.5"/>
 
-  <!-- house mark -->
-  <g filter="url(#soft)" transform="translate(150 96)">
-    <rect x="0" y="60" width="150" height="120" rx="12" fill="#ffffff"/>
-    <path d="M-16 70 L75 0 L166 70 Z" fill="url(#tag)"/>
-    <rect x="34" y="96" width="38" height="38" rx="6" fill="#0d9488"/>
-    <rect x="86" y="96" width="38" height="84" rx="6" fill="#0f766e"/>
-    <text x="53" y="150" font-family="Arial, sans-serif" font-size="30" font-weight="700" fill="#f59e0b" text-anchor="middle">zł</text>
+  <!-- mark: amber tile + minimal house -->
+  <g filter="url(#tileShadow)">
+    <rect x="80" y="110" width="100" height="100" rx="22" fill="#e8a838"/>
   </g>
+  <g fill="#0e1116">
+    <path d="M130 126 L165 154 L95 154 Z"/>
+    <rect x="104" y="154" width="52" height="40"/>
+  </g>
+  <rect x="123" y="170" width="14" height="24" fill="#e8a838"/>
 
-  <!-- wordmark -->
-  <g transform="translate(360 0)">
-    <text x="0" y="150" font-family="Arial, Helvetica, sans-serif" font-size="74" font-weight="800" fill="#ffffff">Opłacalne<tspan fill="url(#tag)">Mieszkanie</tspan></text>
-    <text x="4" y="200" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="500" fill="#d1fae5">OLX + Otodom → realna wycena → ranking okazji</text>
-    <g transform="translate(4 232)" font-family="Arial, sans-serif" font-size="20" font-weight="600">
-      <rect x="0" y="0" width="180" height="40" rx="20" fill="#ffffff" opacity="0.14"/>
-      <text x="90" y="26" fill="#ffffff" text-anchor="middle">FastAPI + HTMX</text>
-      <rect x="196" y="0" width="190" height="40" rx="20" fill="#ffffff" opacity="0.14"/>
-      <text x="291" y="26" fill="#ffffff" text-anchor="middle">RQ + Redis + Postgres</text>
-      <rect x="402" y="0" width="210" height="40" rx="20" fill="#ffffff" opacity="0.14"/>
-      <text x="507" y="26" fill="#ffffff" text-anchor="middle">skalowalny throughput</text>
-    </g>
-  </g>
+  <!-- wordmark (two-tone, weight contrast) -->
+  <text x="220" y="160" font-family="'Helvetica Neue', Arial, sans-serif" font-size="70" letter-spacing="-1.5">
+    <tspan font-weight="300" fill="#f4f2ec">Opłacalne</tspan><tspan font-weight="800" fill="#e8a838">Mieszkanie</tspan>
+  </text>
+
+  <!-- short accent rule -->
+  <rect x="222" y="180" width="124" height="3" rx="1.5" fill="#e8a838"/>
+
+  <!-- tagline -->
+  <text x="221" y="216" font-family="'Helvetica Neue', Arial, sans-serif" font-size="24" font-weight="400" fill="#8b94a3">Znajdź mieszkania tańsze, niż są warte.</text>
 </svg>
