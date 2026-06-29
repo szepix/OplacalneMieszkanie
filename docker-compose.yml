@@ -12,12 +12,14 @@ services:
     ports: ["6379:6379"]
   web:
     build: .
-    command: uvicorn web.app:app --host 0.0.0.0 --port 8000
+    command: sh -c "uvicorn web.app:app --host 0.0.0.0 --port 8888 --workers ${WEB_WORKERS:-2}"
     environment:
       DATABASE_URL: postgresql+psycopg://wf:wf@postgres:5432/wf
       REDIS_URL: redis://redis:6379/0
-    ports: ["8000:8000"]
+      WEB_WORKERS: ${WEB_WORKERS:-2}
+    ports: ["8888:8888"]
     depends_on: [postgres, redis]
+  # Stateless RQ worker — scale horizontally: docker compose up --scale worker=N
   worker:
     build: .
     command: python -m worker.run

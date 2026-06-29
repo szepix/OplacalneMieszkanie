@@ -36,6 +36,28 @@ def test_status_fragment_renders_results_when_done(client, db):
     assert "every 2s" not in r.text  # polling stops when done
 
 
+def test_results_split_normal_above_suspect_section(client, db):
+    from db import crud
+    job = crud.create_job(db, "1.1.1.1", {"woj": "x", "miasto": "y", "rooms": []})
+    crud.add_results(db, job.id, [
+        {"url": "https://olx/good", "value": 1.30, "eff_price": 500000, "area": 50.0,
+         "wycena": 650000, "wycena_med": 640000, "src": "OLX", "district": "Wola",
+         "reliable": True, "suspect": False},
+        {"url": "https://olx/bad", "value": 2.10, "eff_price": 300000, "area": 40.0,
+         "wycena": 630000, "wycena_med": 620000, "src": "Otodom", "district": "Wola",
+         "reliable": False, "suspect": True},
+    ])
+    crud.set_status(db, job.id, "done", count_qualified=2,
+                    finished_at=datetime.now(timezone.utc))
+    r = client.get(f"/job/{job.id}/status")
+    assert "Najlepsze wyceny" in r.text
+    assert "Podejrzane wyceny (1)" in r.text
+    assert r.text.index("https://olx/good") < r.text.index("Podejrzane wyceny")
+    assert r.text.index("https://olx/bad") > r.text.index("Podejrzane wyceny")
+    # suspect value badges are muted (no green/amber "deal" coloring)
+    assert "value muted" in r.text
+
+
 def test_results_render_when_wycena_missing(client, db):
     from db import crud
     job = crud.create_job(db, "1.1.1.1", {"woj": "x", "miasto": "y", "rooms": []})

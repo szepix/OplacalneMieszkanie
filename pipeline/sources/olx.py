@@ -33,12 +33,14 @@ def olx_row(o):
     }
 
 
-def fetch_olx(spec, city_id, max_pages=40):
+def fetch_olx(spec, city_id, max_pages=40, district_id=None):
     rows, offset = [], 0
     enums = sorted({ROOM_ENUM.get(n, "four") for n in spec.rooms})
     while offset <= 1000 and offset // 40 < max_pages:
         q = {"offset": offset, "limit": 40, "category_id": OLX_CAT, "city_id": city_id,
              "filter_float_price:from": spec.price_min, "filter_float_price:to": spec.price_max}
+        if district_id:
+            q["district_id"] = district_id
         for i, e in enumerate(enums):
             q[f"filter_enum_rooms[{i}]"] = e
         d = _json(OLX_API + "?" + urllib.parse.urlencode(q))

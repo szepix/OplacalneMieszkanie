@@ -3,19 +3,193 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>WycenaFinder</title>
+  <title>WycenaFinder — najlepiej wycenione mieszkania</title>
   <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
   <style>
-    body { font: 15px/1.5 system-ui, sans-serif; max-width: 1000px; margin: 2rem auto; padding: 0 1rem; }
-    label { display: inline-block; margin: .25rem .75rem .25rem 0; }
-    input[type=text], input[type=number], select { padding: .3rem; }
-    table { border-collapse: collapse; width: 100%; margin-top: 1rem; }
-    td, th { border: 1px solid #ddd; padding: 4px 8px; text-align: left; }
-    .err { color: #b00020; font-weight: 600; }
-    .suspect { color: #b07000; }
-    .reliable { color: #008000; }
-    fieldset { border: 1px solid #ccc; margin: .5rem 0; }
+    :root{
+      --indigo-900:#1e1445; --indigo-700:#362465; --indigo-600:#47317f;
+      --tint:#f4f1fb; --tint-2:#f5f0ff;
+      --amber:#d97706; --amber-700:#b45309;
+      --green:#15803d; --green-bg:#dcfce7;
+      --ink:#111827; --muted:#6b7280; --line:#e5e7eb; --white:#fff;
+      --radius:16px; --radius-sm:10px;
+      --shadow-card:0 18px 40px -20px rgba(30,20,69,.45), 0 2px 6px -2px rgba(30,20,69,.10);
+      --shadow-soft:0 1px 3px rgba(17,24,39,.08);
+      --font-body:'Poppins', system-ui, -apple-system, sans-serif;
+      --font-display:'Space Grotesk', 'Poppins', system-ui, sans-serif;
+    }
+    *{box-sizing:border-box;}
+    html{-webkit-text-size-adjust:100%;}
+    body{margin:0;font-family:var(--font-body);font-size:15px;line-height:1.55;
+      color:var(--ink);background:var(--tint);}
+    a{color:var(--indigo-600);text-decoration:none;}
+    a:hover{text-decoration:underline;}
+    h1,h2,h3{font-family:var(--font-display);font-weight:700;line-height:1.15;margin:0;}
+
+    .site{background:var(--indigo-900);color:#fff;}
+    .site .bar{max-width:1080px;margin:0 auto;padding:.85rem 1.25rem;
+      display:flex;align-items:center;gap:.6rem;}
+    .brand{font-family:var(--font-display);font-weight:700;font-size:1.25rem;
+      letter-spacing:-.02em;color:#fff;}
+    .brand:hover{text-decoration:none;}
+    .brand .dot{color:#c4b5fd;}
+    .site .tag{margin-left:auto;font-size:.82rem;color:#c4b5fd;letter-spacing:.01em;}
+
+    .wrap{max-width:1080px;margin:0 auto;padding:1.5rem 1.25rem 4rem;}
+
+    .card{background:var(--white);border:1px solid var(--line);border-radius:var(--radius);
+      box-shadow:var(--shadow-card);padding:1.5rem;}
+
+    label{display:block;font-size:.78rem;font-weight:600;letter-spacing:.03em;
+      text-transform:uppercase;color:var(--muted);margin:0 0 .35rem;}
+    input[type=text],input[type=number],select,.combo-input{
+      width:100%;font:inherit;color:var(--ink);background:var(--white);
+      border:1.5px solid var(--line);border-radius:var(--radius-sm);
+      padding:.6rem .7rem;transition:border-color .12s, box-shadow .12s;}
+    input:focus,select:focus,.combo-input:focus{outline:none;border-color:var(--indigo-600);
+      box-shadow:0 0 0 3px rgba(71,49,127,.15);}
+
+    .field{margin-bottom:1rem;}
+    .grid{display:grid;gap:1rem;}
+    .grid-2{grid-template-columns:1fr 1fr;}
+    .grid-3{grid-template-columns:repeat(3,1fr);}
+    @media(max-width:640px){.grid-2,.grid-3{grid-template-columns:1fr;}}
+
+    .section-eyebrow{font-family:var(--font-display);font-weight:600;font-size:.72rem;
+      letter-spacing:.14em;text-transform:uppercase;color:var(--indigo-600);
+      margin:1.5rem 0 .7rem;display:flex;align-items:center;gap:.5rem;}
+    .section-eyebrow::after{content:"";flex:1;height:1px;background:var(--line);}
+
+    .chips{display:flex;flex-wrap:wrap;gap:.5rem;}
+    .chip{display:inline-flex;align-items:center;margin:0;padding:.45rem .9rem;
+      font-size:.9rem;font-weight:500;text-transform:none;letter-spacing:0;color:var(--ink);
+      background:var(--tint);border:1.5px solid var(--line);border-radius:999px;cursor:pointer;
+      transition:all .12s;}
+    .chip input{position:absolute;opacity:0;width:0;height:0;}
+    .chip:hover{border-color:var(--indigo-600);}
+    .chip:has(input:checked){background:var(--indigo-700);color:#fff;border-color:var(--indigo-700);}
+
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;
+      font:inherit;font-family:var(--font-display);font-weight:600;cursor:pointer;
+      border-radius:var(--radius-sm);padding:.8rem 1.4rem;border:1.5px solid transparent;}
+    .btn-primary{background:var(--indigo-700);color:#fff;width:100%;font-size:1.02rem;
+      box-shadow:0 8px 20px -8px rgba(54,36,101,.6);transition:transform .08s, background .12s;}
+    .btn-primary:hover{background:var(--indigo-600);text-decoration:none;}
+    .btn-primary:active{transform:translateY(1px);}
+
+    .combo{position:relative;}
+    .combo-list{position:absolute;z-index:30;left:0;right:0;top:calc(100% + 4px);
+      max-height:248px;overflow:auto;margin:0;padding:4px;list-style:none;background:#fff;
+      border:1px solid var(--line);border-radius:var(--radius-sm);box-shadow:var(--shadow-card);}
+    .combo-list li{padding:.5rem .6rem;border-radius:8px;cursor:pointer;}
+    .combo-list li:hover,.combo-list li[aria-selected=true]{background:var(--tint);}
+    .combo-empty{padding:.6rem;color:var(--muted);font-size:.9rem;}
+
+    .err{background:#fef2f2;border:1px solid #fecaca;color:#b00020;
+      border-radius:var(--radius-sm);padding:.7rem .9rem;font-weight:500;margin:0 0 1rem;}
+
+    table{border-collapse:separate;border-spacing:0;width:100%;}
+    thead th{font-family:var(--font-display);font-size:.72rem;font-weight:600;letter-spacing:.06em;
+      text-transform:uppercase;color:var(--muted);text-align:left;padding:.6rem .7rem;
+      border-bottom:1.5px solid var(--line);white-space:nowrap;}
+    tbody td{padding:.65rem .7rem;border-bottom:1px solid var(--line);vertical-align:middle;}
+    tbody tr:hover{background:var(--tint-2);}
+    .rank{font-family:var(--font-display);font-weight:600;color:var(--muted);}
+    .src{font-size:.72rem;font-weight:600;color:var(--muted);}
+
+    .value{display:inline-flex;align-items:baseline;gap:.05rem;font-family:var(--font-display);
+      font-weight:700;font-size:.95rem;padding:.2rem .5rem;border-radius:999px;
+      background:var(--tint);color:var(--indigo-700);}
+    .value.good{background:var(--green-bg);color:var(--green);}
+    .value.mid{background:#fef3c7;color:var(--amber-700);}
+    .value.muted{background:var(--tint);color:var(--muted);}
+    .value .x{font-size:.72em;opacity:.7;margin-right:1px;}
+
+    .pill{display:inline-block;font-size:.72rem;font-weight:600;padding:.15rem .5rem;
+      border-radius:999px;}
+    .pill.reliable{background:var(--green-bg);color:var(--green);}
+    .pill.suspect{background:#fef3c7;color:var(--amber-700);}
+
+    details.suspect-box{margin-top:1.5rem;border:1px solid var(--line);border-radius:var(--radius);
+      background:#fff;overflow:hidden;}
+    details.suspect-box summary{cursor:pointer;list-style:none;padding:.9rem 1.1rem;
+      font-family:var(--font-display);font-weight:600;color:var(--amber-700);
+      background:#fffbeb;display:flex;align-items:center;gap:.5rem;}
+    details.suspect-box summary::-webkit-details-marker{display:none;}
+    details.suspect-box summary::before{content:"▸";transition:transform .15s;}
+    details.suspect-box[open] summary::before{transform:rotate(90deg);}
+    details.suspect-box .inner{padding:.4rem 1.1rem 1rem;}
+    .table-scroll{overflow-x:auto;}
+
+    .meta{color:var(--muted);font-size:.92rem;}
+    .badge-cache{font-size:.72rem;font-weight:600;color:var(--indigo-600);
+      background:var(--tint);padding:.1rem .5rem;border-radius:999px;}
+    .empty{color:var(--muted);padding:2rem 0;text-align:center;}
+
+    .spinner{display:inline-block;width:1.1rem;height:1.1rem;vertical-align:-.2rem;
+      border:2.5px solid var(--line);border-top-color:var(--indigo-600);border-radius:50%;
+      animation:spin .7s linear infinite;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+    @media(prefers-reduced-motion:reduce){.spinner{animation:none;}}
+
+    footer.site-foot{max-width:1080px;margin:0 auto;padding:1.5rem 1.25rem 2.5rem;
+      color:var(--muted);font-size:.82rem;}
   </style>
 </head>
-<body>{% block body %}{% endblock %}</body>
+<body>
+  <header class="site">
+    <div class="bar">
+      <a class="brand" href="/">Wycena<span class="dot">Finder</span></a>
+      <span class="tag">Szukamy mieszkań najlepiej wycenionych względem rynku</span>
+    </div>
+  </header>
+  {% block body %}{% endblock %}
+  <footer class="site-foot">Dane: deweloperuch.pl · OLX · Otodom. Wyceny orientacyjne, nie stanowią porady inwestycyjnej.</footer>
+  <script>
+  (function(){
+    function combo(el){return el.closest('.combo');}
+    function list(c){return c.querySelector('.combo-list');}
+    function closeAll(except){
+      document.querySelectorAll('.combo-list').forEach(function(l){
+        if(l!==except) l.hidden=true;
+      });
+    }
+    document.addEventListener('focusin',function(e){
+      var inp=e.target.closest('.combo-input'); if(!inp) return;
+      var l=list(combo(inp)); closeAll(l); l.hidden=false;
+    });
+    document.addEventListener('input',function(e){
+      var inp=e.target.closest('.combo-input'); if(!inp) return;
+      var c=combo(inp), l=list(c), q=inp.value.trim().toLowerCase(), any=false;
+      l.querySelectorAll('li').forEach(function(li){
+        var m=li.textContent.toLowerCase().indexOf(q)!==-1; li.hidden=!m; any=any||m;
+      });
+      l.hidden=!any;
+      c.querySelector('input[type=hidden]').value='';   // typing clears prior pick
+    });
+    document.addEventListener('click',function(e){
+      var li=e.target.closest('.combo-list li');
+      if(li){
+        var c=combo(li);
+        c.querySelector('.combo-input').value=li.dataset.value;
+        var hid=c.querySelector('input[type=hidden]');
+        hid.value=li.dataset.value; list(c).hidden=true;
+        hid.dispatchEvent(new Event('change',{bubbles:true}));  // fire HTMX cascade
+        return;
+      }
+      if(!e.target.closest('.combo')) closeAll();
+    });
+    document.addEventListener('submit',function(e){
+      var bad=null;
+      e.target.querySelectorAll('.combo-input[data-required]').forEach(function(inp){
+        if(!combo(inp).querySelector('input[type=hidden]').value && !bad) bad=inp;
+      });
+      if(bad){e.preventDefault();bad.focus();bad.style.borderColor='#b00020';}
+    });
+  })();
+  </script>
+</body>
 </html>

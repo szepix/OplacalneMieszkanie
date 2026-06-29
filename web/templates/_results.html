@@ -1,32 +1,59 @@
+{% macro value_class(v) %}{% if v >= 1.15 %}good{% elif v >= 1.0 %}mid{% endif %}{% endmacro %}
+{% macro rows(items, start, muted=false) %}
+<div class="table-scroll">
+<table>
+  <thead><tr>
+    <th>#</th><th>value</th><th>cena</th><th>wycena</th><th>m²</th>
+    <th>lokalizacja</th><th>źródło</th><th>ocena</th>
+  </tr></thead>
+  <tbody>
+  {% for r in items %}
+    <tr>
+      <td class="rank">{{ start + loop.index }}</td>
+      <td><span class="value {{ 'muted' if muted else value_class(r.value)|trim }}"><span class="x">×</span>{{ "%.2f"|format(r.value) }}</span></td>
+      <td>{{ r.eff_price|fmt }} zł</td>
+      <td>{{ ([r.wycena, r.wycena_med]|select|list|min|fmt) if (r.wycena or r.wycena_med) else "—" }} zł</td>
+      <td>{{ r.area|round(0)|int }}</td>
+      <td><a href="{{ r.url|href_safe }}" target="_blank" rel="noopener">
+        {{ r.street or r.district or "—" }}{% if r.number %} {{ r.number }}{% endif %}
+        {% if r.metro_name %}<span class="meta"> · M: {{ r.metro_name }} ({{ r.metro_m }} m)</span>{% endif %}
+      </a></td>
+      <td class="src">{{ r.src }}</td>
+      <td>
+        {% if r.reliable %}<span class="pill reliable">pewne</span>
+        {% elif r.suspect %}<span class="pill suspect">podejrzane</span>{% endif %}
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endmacro %}
+
 <div id="status">
-  <p>Gotowe — {{ results|length }} ofert z wyceną
-     {% if job.from_cache %}(z cache){% endif %}.</p>
-  {% if results %}
-  <table>
-    <thead><tr>
-      <th>#</th><th>value</th><th>cena (zł)</th><th>wycena (zł)</th>
-      <th>m²</th><th>lokalizacja</th><th>źródło</th><th>flagi</th>
-    </tr></thead>
-    <tbody>
-    {% for r in results %}
-      <tr>
-        <td>{{ loop.index }}</td>
-        <td><strong>{{ r.value }}</strong></td>
-        <td>{{ r.eff_price|fmt }}</td>
-        <td>{{ ([r.wycena, r.wycena_med]|select|list|min|fmt) if (r.wycena or r.wycena_med) else "—" }}</td>
-        <td>{{ r.area|round(0) }}</td>
-        <td><a href="{{ r.url|href_safe }}" target="_blank" rel="noopener">
-          {{ r.street or r.district or "—" }}{% if r.number %} {{ r.number }}{% endif %}
-          {% if r.metro_name %}· M: {{ r.metro_name }} ({{ r.metro_m }} m){% endif %}
-        </a></td>
-        <td>{{ r.src }}</td>
-        <td>
-          {% if r.reliable %}<span class="reliable">pewne</span>{% endif %}
-          {% if r.suspect %}<span class="suspect">podejrzane</span>{% endif %}
-        </td>
-      </tr>
-    {% endfor %}
-    </tbody>
-  </table>
-  {% else %}<p>Brak ofert spełniających kryteria.</p>{% endif %}
+  {% set normal = results|rejectattr("suspect")|list %}
+  {% set suspect = results|selectattr("suspect")|list %}
+  <p class="meta">Gotowe — <strong>{{ results|length }}</strong> ofert z wyceną
+     {% if job.from_cache %}<span class="badge-cache">z cache</span>{% endif %}.</p>
+
+  {% if normal %}
+    <div class="card" style="padding:1rem 1.1rem;">
+      <h2 style="font-size:1.15rem;margin-bottom:.6rem;">Najlepsze wyceny <span class="meta" style="font-weight:400;">({{ normal|length }})</span></h2>
+      {{ rows(normal, 0) }}
+    </div>
+  {% elif not suspect %}
+    <p class="empty">Brak ofert spełniających kryteria.</p>
+  {% else %}
+    <p class="empty">Brak pewnych wycen — wszystkie {{ suspect|length }} oferty oznaczono jako podejrzane (rozwiń niżej).</p>
+  {% endif %}
+
+  {% if suspect %}
+    <details class="suspect-box">
+      <summary>Podejrzane wyceny ({{ suspect|length }})</summary>
+      <div class="inner">
+        <p class="meta" style="margin:.2rem 0 .6rem;">Niska pewność wyceny: zbyt dobra cena, mała próbka porównań lub zgrubne dopasowanie lokalizacji. Traktuj ostrożnie.</p>
+        {{ rows(suspect, 0, muted=true) }}
+      </div>
+    </details>
+  {% endif %}
 </div>

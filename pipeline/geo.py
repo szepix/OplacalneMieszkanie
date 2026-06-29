@@ -27,6 +27,31 @@ def _cities(region_id: int) -> list[dict]:
         _GEO_LOOKUP_CACHE[key] = (_json(url) or {}).get("data", [])
     return _GEO_LOOKUP_CACHE[key]
 
+def _districts(city_id: int) -> list[dict]:
+    key = f"districts:{city_id}"
+    if key not in _GEO_LOOKUP_CACHE:
+        url = f"https://www.olx.pl/api/v1/geo-encoder/cities/{city_id}/districts/"
+        _GEO_LOOKUP_CACHE[key] = (_json(url) or {}).get("data", [])
+    return _GEO_LOOKUP_CACHE[key]
+
+def list_regions() -> list[str]:
+    return [r["name"] for r in _regions()]
+
+def cities_for_region(woj: str) -> list[str]:
+    wn = _norm(woj)
+    region = next((r for r in _regions() if _norm(r["name"]) == wn or r.get("normalized_name") == wn), None)
+    if not region:
+        return []
+    return sorted(c["name"] for c in _cities(region["id"]))
+
+def districts_for_city(city_id: int) -> list[dict]:
+    return _districts(city_id)
+
+def resolve_district(city_id: int, name: str) -> int | None:
+    dn = _norm(name)
+    d = next((x for x in _districts(city_id) if _norm(x["name"]) == dn), None)
+    return d["id"] if d else None
+
 def resolve_city(woj: str, miasto: str) -> dict | None:
     wn, mn = _norm(woj), _norm(miasto)
     region = next((r for r in _regions() if _norm(r["name"]) == wn or r.get("normalized_name") == wn), None)

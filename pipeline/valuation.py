@@ -80,9 +80,7 @@ def value_of(r, spec, use_address_geocode=False, warszawa=False):
     r["value_med"] = round(wmed / r["eff_price"], 3) if wmed else r["value_est"]
     r["value"] = round(min(w["value"], wmed or w["value"]) / r["eff_price"], 3)
     good_radius = r["radius"] in ("budynek", "poblize", "sasiedztwo")
-    r["reliable"] = (r["reliable_src"] and r["wyc_count"] >= 6 and good_radius
-                     and r.get("geo_src") == "adres")
     r["suspect"] = (r["value_est"] > 1.6 or abs(r["value_est"] - r["value_med"]) > 0.45
-                    or r["wyc_count"] < 5 or r["radius"] in ("dzielnica", "miasto", "miejscowosc")
-                    or r.get("geo_src") != "adres")
+                    or r["wyc_count"] < 5 or r["radius"] in ("miasto", "miejscowosc"))
+    r["reliable"] = r["wyc_count"] >= 8 and good_radius and not r["suspect"]
     return r

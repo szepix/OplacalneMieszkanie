@@ -1,0 +1,11 @@
+{% macro combo(name, options, placeholder, value="", hx_get="", hx_target="", hx_include="", required=false) -%}
+<div class="combo">
+  <input type="hidden" name="{{ name }}" value="{{ value }}"
+    {%- if hx_get %} hx-get="{{ hx_get }}" hx-trigger="change" hx-target="{{ hx_target }}" hx-swap="innerHTML" hx-include="{{ hx_include }}"{% endif %}>
+  <input type="text" class="combo-input" placeholder="{{ placeholder }}" autocomplete="off"
+    value="{{ value }}"{% if required %} data-required="1"{% endif %}>
+  <ul class="combo-list" hidden>
+    {% for o in options %}<li data-value="{{ o }}">{{ o }}</li>{% endfor %}
+  </ul>
+</div>
+{%- endmacro %}

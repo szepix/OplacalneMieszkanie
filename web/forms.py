@@ -18,7 +18,8 @@ def build_spec(form) -> SearchSpec:
     pmin = _int(form, "price_min")
     pmax = _int(form, "price_max")
     spec = SearchSpec(
-        woj=form.get("woj", ""), miasto=form.get("miasto", ""), rooms=rooms,
+        woj=form.get("woj", ""), miasto=form.get("miasto", ""),
+        dzielnica=form.get("dzielnica", ""), rooms=rooms,
         price_min=pmin if pmin is not None else 0,
         price_max=pmax if pmax is not None else 10_000_000,
         area_min=_int(form, "area_min"), area_max=_int(form, "area_max"),

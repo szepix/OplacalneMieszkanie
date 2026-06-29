@@ -11,9 +11,32 @@ NOMINATIM_UA = "olx-mieszkania-finder/1.0 (daniel@szepi.dev)"
 
 OLX_API = "https://www.olx.pl/api/v1/offers/"
 
+# Outbound throttle hook. No-op until a worker installs a RedisThrottle via
+# set_throttle(); keeps CLI/standalone use Redis-free. See pipeline/throttle.py.
+_THROTTLE = None
+_THROTTLE_MAX_WAIT = 30.0
+
+def set_throttle(t, max_wait=30.0):
+    global _THROTTLE, _THROTTLE_MAX_WAIT
+    _THROTTLE = t
+    _THROTTLE_MAX_WAIT = max_wait
+
+def clear_throttle():
+    global _THROTTLE
+    _THROTTLE = None
+
+def _domain(url):
+    host = urllib.parse.urlparse(url).hostname or ""
+    return host[4:] if host.startswith("www.") else host
+
+def _throttle(url):
+    if _THROTTLE is not None:
+        _THROTTLE.acquire(_domain(url), max_wait=_THROTTLE_MAX_WAIT)
+
 _CURL = shutil.which("curl")
 def _get_curl(url, headers=None):
     if not _CURL: return ""
+    _throttle(url)
     cmd = [_CURL, "-sL", "--compressed", "--max-time", "40", "-A", UA]
     for k, v in (headers or {}).items():
         if k.lower() not in ("user-agent", "accept-encoding"): cmd += ["-H", f"{k}: {v}"]
@@ -29,6 +52,7 @@ def _get(url, headers=None, tries=3):
     req = urllib.request.Request(url, headers=h)
     for a in range(tries):
         try:
+            _throttle(url)
             with urllib.request.urlopen(req, timeout=40, context=SSL_CTX) as r:
                 data = r.read()
                 if r.headers.get("Content-Encoding") == "gzip":

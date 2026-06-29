@@ -1,0 +1,5 @@
+{% from "_combo.html" import combo %}
+<label>Miasto</label>
+{{ combo('miasto', cities, 'Wybierz miasto', hx_get='/geo/districts',
+         hx_target='#district-slot', hx_include='[name=woj],[name=miasto]', required=true) }}
+<div id="district-slot" hx-swap-oob="true"></div>

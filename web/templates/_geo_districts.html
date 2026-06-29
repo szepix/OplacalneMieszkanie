@@ -1,0 +1,5 @@
+{% from "_combo.html" import combo %}
+{% if districts %}
+<label>Dzielnica</label>
+{{ combo('dzielnica', districts, 'Dzielnica (opcjonalnie)', hx_get='', hx_target='', hx_include='') }}
+{% endif %}

@@ -20,3 +20,12 @@ def test_invalid_rynek_rejected():
 
 def test_feature_keys():
     assert FEATURE_KEYS == ("ogrod", "parking", "klimatyzacja", "komorka")
+
+def test_dzielnica_normalized():
+    s = SearchSpec(woj="Mazowieckie", miasto="Warszawa", rooms=[2],
+                   dzielnica="  Mokotów ").normalized()
+    assert s.dzielnica == "mokotów"
+
+def test_dzielnica_defaults_empty():
+    s = SearchSpec(woj="x", miasto="y", rooms=[]).normalized()
+    assert s.dzielnica == ""

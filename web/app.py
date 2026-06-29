@@ -8,6 +8,7 @@ from db import crud
 from jobs.ratelimit import check_and_reserve
 from jobs.queue import enqueue_job
 from web.forms import build_spec
+from pipeline.geo import list_regions, cities_for_region, districts_for_city, resolve_city
 
 
 @asynccontextmanager
@@ -29,7 +30,22 @@ templates.env.filters["href_safe"] = _href_safe
 
 @app.get("/", response_class=HTMLResponse)
 def index(request: Request):
-    return templates.TemplateResponse(request, "index.html")
+    return templates.TemplateResponse(request, "index.html", {"regions": list_regions()})
+
+
+@app.get("/geo/cities", response_class=HTMLResponse)
+def geo_cities(request: Request, woj: str = ""):
+    return templates.TemplateResponse(
+        request, "_geo_cities.html", {"cities": cities_for_region(woj)})
+
+
+@app.get("/geo/districts", response_class=HTMLResponse)
+def geo_districts(request: Request, woj: str = "", miasto: str = ""):
+    city = resolve_city(woj, miasto)
+    districts = ([d["name"] for d in districts_for_city(city["city_id"])]
+                 if city and city.get("has_districts") else [])
+    return templates.TemplateResponse(
+        request, "_geo_districts.html", {"districts": districts})
 
 
 @app.post("/search")

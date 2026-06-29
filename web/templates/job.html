@@ -1,8 +1,11 @@
 {% extends "base.html" %}
 {% block body %}
-<p><a href="/">&larr; Nowe wyszukiwanie</a></p>
-<h1>Zlecenie {{ job_id }}</h1>
-<div id="status" hx-get="/job/{{ job_id }}/status" hx-trigger="load" hx-swap="outerHTML">
-  <p>Ładowanie statusu…</p>
-</div>
+<main class="wrap">
+  <p style="margin:.2rem 0 1rem;"><a href="/">← Nowe wyszukiwanie</a></p>
+  <h1 style="font-size:1.5rem;">Wyniki wyszukiwania</h1>
+  <p class="meta" style="margin:.3rem 0 1.2rem;">Zlecenie {{ job_id }}</p>
+  <div id="status" hx-get="/job/{{ job_id }}/status" hx-trigger="load" hx-swap="outerHTML">
+    <p class="meta"><span class="spinner"></span> Ładowanie statusu…</p>
+  </div>
+</main>
 {% endblock %}

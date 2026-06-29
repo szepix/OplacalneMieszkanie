@@ -8,6 +8,7 @@ class SearchSpec:
     woj: str
     miasto: str
     rooms: list[int]
+    dzielnica: str = ""
     price_min: int = 0
     price_max: int = 10_000_000
     area_min: float | None = None
@@ -22,6 +23,7 @@ class SearchSpec:
     def normalized(self) -> "SearchSpec":
         self.woj = (self.woj or "").strip().lower()
         self.miasto = (self.miasto or "").strip().lower()
+        self.dzielnica = (self.dzielnica or "").strip().lower()
         self.required_features = [f.strip().lower() for f in self.required_features if f.strip()]
         self.keywords = [k.strip().lower() for k in self.keywords if k.strip()]
         self.rynek = (self.rynek or "any").strip().lower()

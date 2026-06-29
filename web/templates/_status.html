@@ -1,3 +1,6 @@
 <div id="status" hx-get="/job/{{ job_id }}/status" hx-trigger="every 2s" hx-swap="outerHTML">
-  <p>Status: <strong>{{ status }}</strong> — przetwarzanie, odśwież za chwilę…</p>
+  <div class="card" style="display:flex;align-items:center;gap:.7rem;">
+    <span class="spinner"></span>
+    <span>{% if status == "queued" %}W kolejce — zaraz ruszamy…{% else %}Przetwarzamy oferty i pobieramy wyceny…{% endif %}</span>
+  </div>
 </div>
