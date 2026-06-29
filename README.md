@@ -15,6 +15,12 @@
   <img src="https://img.shields.io/badge/testy-real--stack-2ea44f" alt="tests">
 </p>
 
+<p align="center">
+  <a href="https://codespaces.new/szepix/OplacalneMieszkanie">
+    <img src="https://github.com/codespaces/badge.svg" alt="Open in GitHub Codespaces" height="32">
+  </a>
+</p>
+
 ---
 
 ## Co to jest
@@ -101,6 +107,14 @@ Pula proxy / rotacja IP są przygotowane jako *szew* (jedno miejsce w `pipeline/
 ale celowo niezbudowane — YAGNI do czasu realnych banów.
 
 ## Uruchomienie
+
+### GitHub Codespaces (jednym kliknięciem)
+
+Kliknij **Open in GitHub Codespaces** powyżej (albo `Code ▸ Codespaces ▸ Create`
+w repo). GitHub zbuduje obraz, wystartuje cały `docker compose` (web + worker +
+Postgres + Redis) i przekieruje port `8888` na tymczasowy publiczny URL —
+działająca instancja bez konfiguracji lokalnej. To środowisko demonstracyjne,
+nie stały hosting (Codespace usypia po bezczynności).
 
 ### Docker (pełny stack)
 

@@ -1,0 +1,20 @@
+{
+  "name": "OplacalneMieszkanie",
+  "dockerComposeFile": ["../docker-compose.yml"],
+  "service": "web",
+  "workspaceFolder": "/app",
+  "overrideCommand": false,
+  "runServices": ["postgres", "redis", "web", "worker"],
+  "forwardPorts": [8888],
+  "portsAttributes": {
+    "8888": {
+      "label": "OplacalneMieszkanie web",
+      "onAutoForward": "openPreview"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": ["ms-python.python"]
+    }
+  }
+}
