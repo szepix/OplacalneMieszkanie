@@ -8,6 +8,11 @@
 </p>
 
 <p align="center">
+  <a href="https://oplacalne-mieszkanie.onrender.com/"><b>▶ &nbsp;Demo na żywo &nbsp;—&nbsp; oplacalne-mieszkanie.onrender.com</b></a><br>
+  <sub>darmowy hosting · pierwsze wejście budzi instancję (~30 s)</sub>
+</p>
+
+<p align="center">
   <img src="https://img.shields.io/badge/python-3.13-blue" alt="python">
   <img src="https://img.shields.io/badge/FastAPI-HTMX-009688" alt="fastapi">
   <img src="https://img.shields.io/badge/kolejka-RQ%20%2B%20Redis-d82c20" alt="rq">
