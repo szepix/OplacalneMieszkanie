@@ -1,0 +1,38 @@
+# Render Blueprint — one-click deploy of the full stack from this repo.
+# Free tier has no standalone worker, so the web service runs the RQ worker
+# alongside uvicorn (fine on Linux). Postgres + Redis are free managed add-ons.
+databases:
+  - name: wf-db
+    databaseName: wf
+    user: wf
+    plan: free
+
+services:
+  - type: redis
+    name: wf-redis
+    plan: free
+    maxmemoryPolicy: noeviction
+    ipAllowList: []          # internal connections only
+
+  - type: web
+    name: oplacalne-mieszkanie
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    dockerCommand: sh -c "python -m worker.run & exec uvicorn web.app:app --host 0.0.0.0 --port $PORT --workers ${WEB_WORKERS:-1}"
+    healthCheckPath: /
+    envVars:
+      - key: WEB_WORKERS
+        value: "1"
+      - key: MAX_PAGES        # keep the free-tier demo light and fast
+        value: "1"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: wf-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: wf-redis
+          property: connectionString

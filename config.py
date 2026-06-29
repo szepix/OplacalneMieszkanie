@@ -1,6 +1,17 @@
 import os
 
-DATABASE_URL = os.environ.get("DATABASE_URL", "postgresql+psycopg://wf:wf@localhost:5432/wf")
+
+def normalize_db_url(url: str) -> str:
+    """Managed hosts (Render/Heroku) hand out driverless postgres URLs;
+    pin them to psycopg v3, which is what we install."""
+    for scheme in ("postgresql://", "postgres://"):
+        if url.startswith(scheme):
+            return "postgresql+psycopg://" + url[len(scheme):]
+    return url
+
+
+DATABASE_URL = normalize_db_url(
+    os.environ.get("DATABASE_URL", "postgresql+psycopg://wf:wf@localhost:5432/wf"))
 REDIS_URL = os.environ.get("REDIS_URL", "redis://localhost:6379/0")
 SLICE_TTL_SECONDS = int(os.environ.get("SLICE_TTL_SECONDS", 6 * 3600))
 VALUATION_TTL_SECONDS = int(os.environ.get("VALUATION_TTL_SECONDS", 24 * 3600))
